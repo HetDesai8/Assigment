@@ -1,0 +1,17 @@
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - apt-get update -y
+      - apt-get install -y unzip
+      - curl -o terraform.zip https://releases.hashicorp.com/terraform/1.5.7/terraform_1.5.7_linux_amd64.zip
+      - unzip terraform.zip && mv terraform /usr/local/bin/
+  build:
+    commands:
+      - terraform init -backend-config="bucket=$STATE_BUCKET"
+      - terraform plan -var-file="environments/$ENVIRONMENT/$ENVIRONMENT.tfvars" -out=tfplan
+      - terraform apply -auto-approve tfplan
+artifacts:
+  files:
+    - '**/*'
